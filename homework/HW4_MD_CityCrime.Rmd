@@ -64,3 +64,11 @@ The Maryland beach town saw over an 82% increase in violent crime and an almost 
 ### Task 9: Save Your Work and Put it on GitHub
 
 Save this notebook, then commit it to your local repository. Push the changes to your GitHub repository and submit the URL for this file in ELMS.
+
+##Task 10: Percentiles
+
+```{r}
+md_cities_percentiles <- md_cities_change2 |> mutate(violent_percentile = ntile(violent_rate_2020, 100))
+md_cities_percentiles |> summarize (iqr_violent_2020 = IQR(violent_rate_2020))
+```
+I think this data would tweak my previous story idea to widen the scope a little bit. When you look at the counties that are 90th percentile or higher in violent crime rate they are all in rural areas of the state, near the eastern shore or Western Maryland. I think the story could shift to being about how rural counties have the highest rates of crime, despite PG County and Baltimore being considered the most dangerous.
