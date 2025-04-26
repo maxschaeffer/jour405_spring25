@@ -3,6 +3,16 @@ title: "FinalProject"
 output: html_document
 ---
 
+POTENTIAL TESTS
+
+1.Chi-Square. I think a chi-square test will be crucial to look at if the correlation between winning percentage and second/first serve success is real or random. I will need this to help prove that my data means something and isn't just random.
+
+2.T-Test. A t-test could be used to see if there is real significant differences in the second serve and winning percentages. I think this would be a test to run early in the process to have a good baseline of what is a statistically significant enough difference in statistics to be relevant to proving or disproving my hypothesis.
+
+3.Z-Score. I don't know if this qualifies as a test, but I liked the way the fivethirtyeight article demonstrated Spieth's success using Z-Scores. I think looking at people with the highest z-scores on first serve and second serves and then comparing those players rankings winning percentages etc. could be a relatively simple and easily explainable way to visualize which is a more important factor.
+
+I did have some difficulty figuring out which tests would be applicable so if there are other suggestions or obvious ones I'm missing please point me in that direction and I will do that. Also I think my data is now moved to the correct place, please let me know if you are able to access. 
+
 ```{r}
 library(tidyverse)
 ```
@@ -15,4 +25,6 @@ twentythree_data <- read_csv("~/Downloads/2023 final project data - Sheet1.csv")
 ```
 
 This is my data separated by year over the last three years. It has basically all stats regarding the ATP's current men's top 50 players serving stats including, but not limited to their percentage of points won on their first and second serve, double fault percentage, and ace percentage. The most important columns for my examination will be percentage of points won on first vs second serve as well as record and win percentage. These will be the backbone of my statistical analysis as the question I'm looking to answer is which serve is it more critical to have success on. I think this data is pretty comprehensive and will give me a good foundation to answer my guiding question. One thing it is missing though is some way to quantify the amount of trophies a player has won, because at the end of the day you can win a lot of matches, but tennis players will always be judged on trophies particularly the grand slams. Luckily it isnt hard to locate that and I can potentially add a column or just factor that data in separately. One question I have: Is there a way to combine the yearly data so it can be used in R, just switching year to year? 
+
+
 
