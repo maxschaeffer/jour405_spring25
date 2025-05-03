@@ -3,6 +3,17 @@ title: "FinalProject"
 output: html_document
 ---
 
+Trials, Errors, and Lessons
+
+I first wanted to mutate my data somewhat by creating a couple new columns and getting some data from the dataset. I ran into an issue because there was % signs next to my numbers in the columns so I had to trouble shoot via ChatGPT (I accidentally refreshed so I wasn't able to keep the link). 
+The first thing I did was to add a column for the differences in people's first and second serve percentage so if I decide it's helpful to see who has the biggest and smallest gap I have that data available.
+
+I then found the averages of 2nd and 1st serves won percentage so I can have an idea for whats a baseline.
+
+I then moved on to a couple of the tests based on Prof. Willis' reccomendation, the Z-Score tests and correlation test. I only did one correlation test for now on the first serve data from the most recent year, but my values did indicate a significant positive correlation between first serve percentage and winning percentage. 
+
+I also ran Z-scores for both serves in all years. At first glance this seems to indicate a higher importance for second serves given that the world no. 1 that year has the highest z-score (above two) for all given years with more variability for the first serve z-score. I want to dive further into this in my final project and probably create a chart similar to the ones we have done in the past placing people's socres on it. 
+
 POTENTIAL TESTS
 
 1.Chi-Square. I think a chi-square test will be crucial to look at if the correlation between winning percentage and second/first serve success is real or random. I will need this to help prove that my data means something and isn't just random.
@@ -15,6 +26,7 @@ I did have some difficulty figuring out which tests would be applicable so if th
 
 ```{r}
 library(tidyverse)
+library(knitr)
 ```
 
 
@@ -26,5 +38,91 @@ twentythree_data <- read_csv("~/Downloads/2023 final project data - Sheet1.csv")
 
 This is my data separated by year over the last three years. It has basically all stats regarding the ATP's current men's top 50 players serving stats including, but not limited to their percentage of points won on their first and second serve, double fault percentage, and ace percentage. The most important columns for my examination will be percentage of points won on first vs second serve as well as record and win percentage. These will be the backbone of my statistical analysis as the question I'm looking to answer is which serve is it more critical to have success on. I think this data is pretty comprehensive and will give me a good foundation to answer my guiding question. One thing it is missing though is some way to quantify the amount of trophies a player has won, because at the end of the day you can win a lot of matches, but tennis players will always be judged on trophies particularly the grand slams. Luckily it isnt hard to locate that and I can potentially add a column or just factor that data in separately. One question I have: Is there a way to combine the yearly data so it can be used in R, just switching year to year? 
 
+```{r}
+twentyfive_data <- twentyfive_data |> 
+  mutate(
+    `1st serves won%` = as.numeric(gsub("%", "", `1st serves won%`)),
+    `2nd serves won%` = as.numeric(gsub("%", "", `2nd serves won%`)),
+    serve_diff = `1st serves won%` - `2nd serves won%`
+  )
+twentyfour_data <- twentyfour_data |> 
+  mutate(
+    `1st serves won%` = as.numeric(gsub("%", "", `1st serves won%`)),
+    `2nd serves won%` = as.numeric(gsub("%", "", `2nd serves won%`)),
+    serve_diff = `1st serves won%` - `2nd serves won%`
+  )
 
+twentythree_data <- twentythree_data |> 
+  mutate(
+    `1st serves won%` = as.numeric(gsub("%", "", `1st serves won%`)),
+    `2nd serves won%` = as.numeric(gsub("%", "", `2nd serves won%`)),
+    serve_diff = `1st serves won%` - `2nd serves won%`
+  )
+twentyfive_data |> mutate(serve_diff= `1st serves won%` - `2nd serves won%`)
+
+twentyfour_data |> mutate(serve_diff= `1st serves won%` - `2nd serves won%`)
+
+twentythree_data |> mutate(serve_diff= `1st serves won%` - `2nd serves won%`)
+
+```
+
+
+
+```{r}
+mean(twentyfive_data$`1st serves won%`)
+mean(twentyfive_data$`2nd serves won%`)
+mean(twentyfour_data$`1st serves won%`)
+mean(twentyfour_data$`2nd serves won%`)
+mean(twentythree_data$`1st serves won%`)
+mean(twentythree_data$`2nd serves won%`)
+```
+```{r}
+twentyfive_data <- twentyfive_data |>
+  mutate(
+    mean_first = mean(`1st serves won%`),
+    sd_first = sd(`1st serves won%`),
+    z_score_first = (`1st serves won%` - mean_first) / sd_first
+  )
+twentyfour_data <- twentyfour_data |>
+  mutate(
+    mean_first = mean(`1st serves won%`),
+    sd_first = sd(`1st serves won%`),
+    z_score_first = (`1st serves won%` - mean_first) / sd_first
+  )
+twentythree_data <- twentythree_data |>
+  mutate(
+    mean_first = mean(`1st serves won%`),
+    sd_first = sd(`1st serves won%`),
+    z_score_first = (`1st serves won%` - mean_first) / sd_first
+  )
+```
+
+```{r}
+twentyfive_data <- twentyfive_data |>
+  mutate(
+    mean_second = mean(`2nd serves won%`),
+    sd_second = sd(`2nd serves won%`),
+    z_score_second = (`2nd serves won%` - mean_second) / sd_second
+  )
+twentyfour_data <- twentyfour_data |>
+  mutate(
+    mean_second = mean(`2nd serves won%`),
+    sd_second = sd(`2nd serves won%`),
+    z_score_second = (`2nd serves won%` - mean_second) / sd_second
+  )
+twentythree_data <- twentythree_data |>
+  mutate(
+    mean_second = mean(`2nd serves won%`),
+    sd_second = sd(`2nd serves won%`),
+    z_score_second = (`2nd serves won%` - mean_second) / sd_second
+  )
+```
+
+```{r}
+twentyfive_data <- twentyfive_data |> 
+  mutate(
+    `Win Pct.` = as.numeric(gsub("%", "", `Win Pct.`)),
+  )
+cor.test(twentyfive_data$`Win Pct.`, twentyfive_data$`1st serves won%`)
+```
 
