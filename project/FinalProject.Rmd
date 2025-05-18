@@ -1,42 +1,33 @@
 ---
-title: "FinalProject"
+title: "Final Project Max Schaeffer"
 output: html_document
 ---
 
-Trials, Errors, and Lessons
+My final project will be an exploration of tennis statitstics at the highest level of the men's game. Specifically I am examining whether winning a higher percentage of points on your first or second serve is more important to winning a high volume of tennis matches. To do this I will run various tests that we have learned throughout the year to examine the relationship between my variables.
 
-I first wanted to mutate my data somewhat by creating a couple new columns and getting some data from the dataset. I ran into an issue because there was % signs next to my numbers in the columns so I had to trouble shoot via ChatGPT (I accidentally refreshed so I wasn't able to keep the link). 
-The first thing I did was to add a column for the differences in people's first and second serve percentage so if I decide it's helpful to see who has the biggest and smallest gap I have that data available.
 
-I then found the averages of 2nd and 1st serves won percentage so I can have an idea for whats a baseline.
-
-I then moved on to a couple of the tests based on Prof. Willis' reccomendation, the Z-Score tests and correlation test. I only did one correlation test for now on the first serve data from the most recent year, but my values did indicate a significant positive correlation between first serve percentage and winning percentage. 
-
-I also ran Z-scores for both serves in all years. At first glance this seems to indicate a higher importance for second serves given that the world no. 1 that year has the highest z-score (above two) for all given years with more variability for the first serve z-score. I want to dive further into this in my final project and probably create a chart similar to the ones we have done in the past placing people's socres on it. 
-
-POTENTIAL TESTS
-
-1.Chi-Square. I think a chi-square test will be crucial to look at if the correlation between winning percentage and second/first serve success is real or random. I will need this to help prove that my data means something and isn't just random.
-
-2.T-Test. A t-test could be used to see if there is real significant differences in the second serve and winning percentages. I think this would be a test to run early in the process to have a good baseline of what is a statistically significant enough difference in statistics to be relevant to proving or disproving my hypothesis.
-
-3.Z-Score. I don't know if this qualifies as a test, but I liked the way the fivethirtyeight article demonstrated Spieth's success using Z-Scores. I think looking at people with the highest z-scores on first serve and second serves and then comparing those players rankings winning percentages etc. could be a relatively simple and easily explainable way to visualize which is a more important factor.
-
-I did have some difficulty figuring out which tests would be applicable so if there are other suggestions or obvious ones I'm missing please point me in that direction and I will do that. Also I think my data is now moved to the correct place, please let me know if you are able to access. 
+I started by running the necessary programs for my data.
 
 ```{r}
 library(tidyverse)
 library(knitr)
+library(ggplot2)
+library(ggrepel)
 ```
 
+This is my data separated by year over the last three years. It has basically all stats regarding the ATP's current men's top 50 players serving stats including, but not limited to their percentage of points won on their first and second serve, double fault percentage, and ace percentage. The most important columns for my examination will be percentage of points won on first vs second serve as well as record and win percentage. These will be the backbone of my statistical analysis as the question I'm looking to answer is which serve is it more critical to have success on.  
 
 ```{r}
 twentyfive_data<- read_csv("~/Downloads/2025 405 Final Data  - Sheet1.csv")
 twentyfour_data <- read_csv("~/Downloads/2024 Final Projectdata - Sheet1.csv")
 twentythree_data <- read_csv("~/Downloads/2023 final project data - Sheet1.csv")
 ```
+I first wanted to mutate my data somewhat by creating a couple new columns and getting some data from the dataset. I ran into an issue because there was % signs next to my numbers in the columns so I had to trouble shoot/
 
-This is my data separated by year over the last three years. It has basically all stats regarding the ATP's current men's top 50 players serving stats including, but not limited to their percentage of points won on their first and second serve, double fault percentage, and ace percentage. The most important columns for my examination will be percentage of points won on first vs second serve as well as record and win percentage. These will be the backbone of my statistical analysis as the question I'm looking to answer is which serve is it more critical to have success on. I think this data is pretty comprehensive and will give me a good foundation to answer my guiding question. One thing it is missing though is some way to quantify the amount of trophies a player has won, because at the end of the day you can win a lot of matches, but tennis players will always be judged on trophies particularly the grand slams. Luckily it isnt hard to locate that and I can potentially add a column or just factor that data in separately. One question I have: Is there a way to combine the yearly data so it can be used in R, just switching year to year? 
+The first thing I did was to add a column for the differences in people's first and second serve percentage so if I decide it's helpful to see who has the biggest and smallest gap I have that data available.
+
+I then found the averages of 2nd and 1st serves won percentage so I can have an idea for whats a baseline.
+
 
 ```{r}
 twentyfive_data <- twentyfive_data |> 
@@ -65,9 +56,6 @@ twentyfour_data |> mutate(serve_diff= `1st serves won%` - `2nd serves won%`)
 twentythree_data |> mutate(serve_diff= `1st serves won%` - `2nd serves won%`)
 
 ```
-
-
-
 ```{r}
 mean(twentyfive_data$`1st serves won%`)
 mean(twentyfive_data$`2nd serves won%`)
@@ -76,6 +64,9 @@ mean(twentyfour_data$`2nd serves won%`)
 mean(twentythree_data$`1st serves won%`)
 mean(twentythree_data$`2nd serves won%`)
 ```
+
+I ran Z-scores for both serves in all years. At first glance this seems to indicate a higher importance for second serves given that the world no. 1 that year has the highest z-score (above two) for all given years with more variability for the first serve z-score. I want to dive further into this in my final project and probably create a chart similar to the ones we have done in the past placing people's socres on it. 
+
 ```{r}
 twentyfive_data <- twentyfive_data |>
   mutate(
@@ -96,6 +87,7 @@ twentythree_data <- twentythree_data |>
     z_score_first = (`1st serves won%` - mean_first) / sd_first
   )
 ```
+
 
 ```{r}
 twentyfive_data <- twentyfive_data |>
@@ -118,11 +110,104 @@ twentythree_data <- twentythree_data |>
   )
 ```
 
+I decided to visualize the Z-Scores inspired by the work we did in class when talking about the most dominant athlete of all time. I used ChatGPT to help me figure out the correct code for the visualization (https://chatgpt.com/share/682a2899-4c40-8002-9568-33263a7d7eab). I wanted to higlight the outliers of anything over an absolute value of two to show where the players who are exceptionally poor and strong at winning points on their first serve. The only outlier on the positive side was Jannik Sinner who is the number one player in the world, which is a strong case for first serve importance. On the negative side there was Pedro Martinez who was 49, or second to last out of the fifty player sample size as well as Sebastian Baez, who is closer to the middle of the pack. There are high ranked players with negative Z-Scores like Carlos Alcaraz (-.13) and No. 11 Lorenzo Musetti (-1.4) while the third highest Z-Score was No. 43 Gael Monfils (1.57). 
+
 ```{r}
+twentyfive_data$outlier <- abs(twentyfive_data$z_score_first) > 2
+outliers <- subset(twentyfive_data, outlier == TRUE)
+
+# Plot
+ggplot(twentyfive_data, aes(x = z_score_first, y = Rank, color = outlier)) +
+  geom_point(size = 2) +
+  geom_text_repel(
+    data = outliers,
+    aes(label = Name),
+    nudge_x = 0.1,
+    direction = "x",
+    segment.color = "grey50"
+  ) +
+  scale_color_manual(values = c("black", "red")) +
+  labs(
+    title = "First Serve Z-Scores (Outliers Labeled)",
+    x = "Z-Score",
+    y = "Rank",
+    color = "Outlier"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+
+```
+Next I wanted to repeat the steps with the second serve points won Z-Scores to contrast the two charts. Sinner was once again the only positive outlier this time by an even wider margin, despite no one else's Z-Score being over two Sinner's was almost 3.5. It is important to note that Sinner is working with a smaller sample size than other players due to his 3 month suspension after winning the Australian Open. The only negative outlier was No. 25 ranked Alexei Popyrin who was just over -2. The second best second serve z-score belonged to No. 34 Gio Mpetchi-Perricard who is the fastest server on the pro tour. Mpetchi-Perricard having a higher Z-Score on his second serve ratehr than his first is surprising given that you would think due to his ability to hit aces he would be higher on the first serve points won%, but the data seems to signify that he is having too many faults on his first serve, but succesfully avoiding double faults on his second attempt.
+Overall the Z-Scores don't paint a clear picture of what is the most important, but it does give a helpful distribution of where players stand in each metric.
+One thing that stands out is that Sinner is on a completely different level than his peers on both serves even more so his second. Going back to 2023 the year end No. 1 (Sinner then Djokovic) have had a higher Z-Score on their second serve than their first.
+```{r}
+outliers <- subset(twentyfive_data, outlier == TRUE)
+
+twentyfive_data$outlier <- abs(twentyfive_data$z_score_second) > 2
+
+# Plot
+ggplot(twentyfive_data, aes(x = z_score_second, y = Rank, color = outlier)) +
+  geom_point(size = 2) +
+  geom_text_repel(
+    data = outliers,
+    aes(label = Name),
+    nudge_x = 0.1,
+    direction = "x",
+    segment.color = "grey50"
+  ) +
+  scale_color_manual(values = c("black", "red")) +
+  labs(
+    title = "Second Serve Z-Scores (Outliers Labeled)",
+    x = "Z-Score",
+    y = "Rank",
+    color = "Outlier"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+
+```
+
+Next I wanted to run coorelation tests. to see how performance on first and second serves has coorelated to winning percentage over the last three years. In all three years there has been a more positive coorelation between the second serve. This is the most concrete evidence I have found that supports my hypothesis that second serve is most important.
+
+
+```{r}
+twentyfour_data <- twentyfour_data |> 
+  mutate(
+   `Win Pct.` = as.numeric(gsub("%", "", `Win Pct.`))/100)
+
+twentythree_data <- twentythree_data |> 
+  mutate(
+   `Win Pct.` = as.numeric(gsub("%", "", `Win Pct.`))/100)
+
 twentyfive_data <- twentyfive_data |> 
   mutate(
-    `Win Pct.` = as.numeric(gsub("%", "", `Win Pct.`)),
-  )
-cor.test(twentyfive_data$`Win Pct.`, twentyfive_data$`1st serves won%`)
+   `Win Pct.` = as.numeric(gsub("%", "", `Win Pct.`))/100)
+
+twentyfive_data |> summarize(coorelation = cor(z_score_first, `Win Pct.`, method="pearson"))
+
+twentyfive_data |> summarize(coorelation = cor(z_score_second, `Win Pct.`, method="pearson"))
+    
+twentyfour_data |> summarize(coorelation = cor(z_score_first, `Win Pct.`, method="pearson"))
+twentyfour_data |> summarize(coorelation = cor(z_score_second, `Win Pct.`, method="pearson"))
+twentythree_data |> summarize(coorelation = cor(z_score_first, `Win Pct.`, method="pearson"))
+twentythree_data |> summarize(coorelation = cor(z_score_second, `Win Pct.`, method="pearson"))
 ```
 
+FINAL SECTION
+
+My findings indicate support for my hypothesis that winnning a higher percentage of points on your second serve is more important than your first serve. My findings are not conclusive though and there are potential pitfalls such as the Z-Score distributions which don't show a clear lean one way or another.
+To my editors I would pitch a story about this highlighting the coorelation test as my strongest piece of statistical evidence. I also in my article would want to use anecdotes of where top players have stacked up in this since that is likely to keep tennis fans engaged and give them some easily comprehendable answers they can connect the topic to.
+
+Potential Headline: Serving up wins. Is a dominant first or second serve more important on the ATP Tour.
+
+Potential Lede: Tennis fans have long been captivated by the game's greats like Novak Djokovic, Jannik Sinner, and Rodger Federer. 
+
+One thing these players have in common that aids their dominance is the ability to make their opponents life very difficult during their service games, but is that because of how often they win points at the first time of asking or after a fault? 
+
+Statistical analysis found that it is actually more importatnt to win points on your second time of asking than your first. 
